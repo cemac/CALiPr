@@ -7,7 +7,7 @@
 
 # Malawi-CALiPr Data Exploration Tool #
 
-[![GitHub release](https://img.shields.io/github/release/cemac/CALiPr.svg)](https://github.com/cemac/CALiPr/releases) [![GitHub top language](https://img.shields.io/github/languages/top/cemac/CALiPr.svg)](https://github.com/cemac/CALiPr) [![GitHub issues](https://img.shields.io/github/issues/cemac/CALiPr.svg)](https://github.com/cemac/cemac_generic/CALiPr) [![GitHub last commit](https://img.shields.io/github/last-commit/cemac/CALiPr.svg)](https://github.com/cemac/CALiPr/commits/master) [![GitHub All Releases](https://img.shields.io/github/downloads/cemac/CALiPr/total.svg)](https://github.com/cemac/CALiPr/releases)![GitHub](https://img.shields.io/github/license/cemac/CALiPr.svg)
+[![GitHub release](https://img.shields.io/github/release/cemac/CALiPr.svg)](https://github.com/cemac/CALiPr/releases) [![GitHub top language](https://img.shields.io/github/languages/top/cemac/CALiPr.svg)](https://github.com/cemac/CALiPr) [![GitHub issues](https://img.shields.io/github/issues/cemac/CALiPr.svg)](https://github.com/cemac/cemac_generic/CALiPr) [![GitHub last commit](https://img.shields.io/github/last-commit/cemac/CALiPr.svg)](https://github.com/cemac/CALiPr/commits/master) [![GitHub All Releases](https://img.shields.io/github/downloads/cemac/CALiPr/total.svg)](https://github.com/cemac/CALiPr/releases)![GitHub](https://img.shields.io/github/license/cemac/CALiPr.svg)[![DOI](https://zenodo.org/badge/192755973.svg)](https://zenodo.org/badge/latestdoi/192755973)
 
 
 # Description #
