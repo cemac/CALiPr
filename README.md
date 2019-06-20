@@ -46,6 +46,9 @@ Download a copy of the repository from the web interface or using the github GUI
 
 Place a copy of the survey csv file (expected filename is `FarmSurveyClean.csv`) in the same folder as the script files and run from within rstudio. Full instructions are given in the wiki [here](https://github.com/cemac/CALiPr/wiki/Running-the-app)
 
+# Contributing #
+
+If you wish to contribute to this work, or want to make a request for a bug fix or new feature, please see our guide on [contributing] (https://github.com/cemac/CALiPr/blob/master/CONTRIBUTING.md) to the repository.
 
 # Citing this work #
 
