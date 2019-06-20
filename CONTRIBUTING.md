@@ -12,7 +12,7 @@ At the moment the 2 main ways to contribute are via Bug reports and Feature requ
 
 This section guides you through submitting a bug report. Following these guidelines helps maintainers and the community understand your report :pencil:, reproduce the behaviour :computer: :computer:, and find related reports :mag_right:.
 
- Fill in [the template](https://github.com/cemac/CALiPr/issues)<!-- LINK TO ISSUE TAB IN REPO -->.
+ Fill in [the template](https://github.com/cemac/CALiPr/issues/new?assignees=&labels=&template=bug_report.md&title=%5BBUG%5D)<!-- LINK TO ISSUE TAB IN REPO -->.
 
 > **Note:** If you find a **Closed** issue that seems like it is the same thing that you're experiencing, open a new issue and include a link to the original issue in the body of your new one.
 
