@@ -47,14 +47,14 @@ shinyUI(
                    
                    bsCollapse(id = "colps_side",
                               
-                              bsCollapsePanel(title = HTML('<font style="color: white;">File</font>'),
-                                         value="fileCollapse",
-                                         style="primary",
-                                         tags$div(align = 'left',
-                                                  style = "color:black;",
-                                                  fileInput("file", label = h3("File input"),
-                                                            multiple = FALSE,
-                                                            accept = c(".csv", "text/csv")))),
+                              # bsCollapsePanel(title = HTML('<font style="color: white;">File</font>'),
+                              #            value="fileCollapse",
+                              #            style="primary",
+                              #            tags$div(align = 'left',
+                              #                     style = "color:black;",
+                              #                     fileInput("file", label = h3("File input"),
+                              #                               multiple = FALSE,
+                              #                               accept = c(".csv", "text/csv")))),
                               
                               bsCollapsePanel(title = HTML('<font style="color: white;">Locations</font>'), 
                                               value="locCollapse", 
