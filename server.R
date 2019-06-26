@@ -554,16 +554,16 @@ shinyServer(function(input, output,session) {
   
   output$Training <- renderUI ({
     sliderInput("trnrng",
-               "Training Date Range:",
-                min=min(ymd(fsizedat()$Date_trained), na.rm=T),
-                max=max(ymd(fsizedat()$Date_trained), na.rm=T),
-                value=c(date("2012-06-01"), as_date(now())))
+               "Length of Trained Period (Days):",
+                min=min(fsizedat()$Length, na.rm=T),
+                max=max(fsizedat()$Length, na.rm=T),
+                value=c(min(fsizedat()$Length, na.rm=T), max(fsizedat()$Length, na.rm=T)))
   
   })
   
   trndat <- reactive({
     if ( ! is.null(input$trnrng)){
-      subset(fsizedat(), date(Date_trained) >= input$trnrng[[1]] & date(Date_trained) <= input$trnrng[[2]])
+      subset(fsizedat(), Length >= input$trnrng[[1]] & Length <= input$trnrng[[2]])
     } else {fsizedat()}
   })
   
@@ -610,7 +610,7 @@ shinyServer(function(input, output,session) {
     validate(
       need((nrow(myData()) >= 1), "No data in dataset. Subsetting too restrictive")
     )
-    x <- ymd(myData()$Date_trained)
+    x <- myData()$Length
     # generate bins based on input$bins and range in input$trnrng from ui.R
     if (! is.null(input$trnrng) ) {
 
@@ -618,8 +618,8 @@ shinyServer(function(input, output,session) {
       max_bin = input$trnrng[[2]]
       binnum = input$bins + 1
     } else {
-      min_bin = min(ymd(myData()$Date_trained), na.rm=T)
-      max_bin = max(ymd(myData()$Date_trained), na.rm=T)
+      min_bin = min(myData()$Length, na.rm=T)
+      max_bin = max(myData()$Length, na.rm=T)
       binnum = 31
     }
     bins <- seq(min_bin, max_bin, length.out = binnum)
