@@ -5,6 +5,7 @@ library(tidyverse)
 library(leaflet.extras)
 library(lubridate)
 library(rgdal)
+library(raster)
 library(shinyBS)
 library(shinyjs)
 library(shinyWidgets)
@@ -15,22 +16,22 @@ shinyUI(
   dashboardPage(skin = "blue",
   title = "Malawi Farm Survey",
   dashboardHeader(title = "Malawi Farm Survey", titleWidth = 420),
-  
+
   # interactive sidebar with menu and widgets
   dashboardSidebar(width = 420,
                    tags$div(
                      tags$blockquote("Data Exploration Tools"),
                      style = "padding: 10px;"
-                     
+
                    ),
                    useShinyjs(),
                    tags$head(
                      tags$style(HTML("
-                                     .multicol { 
+                                     .multicol {
                                      height: 18em;
-                                     -webkit-column-count: 2; /* Chrome, Safari, Opera */ 
-                                     -moz-column-count: 2;    /* Firefox */ 
-                                     column-count: 2; 
+                                     -webkit-column-count: 2; /* Chrome, Safari, Opera */
+                                     -moz-column-count: 2;    /* Firefox */
+                                     column-count: 2;
                                      -moz-column-fill: auto;
                                      -column-fill: auto;
                                      width: 19em;
@@ -40,13 +41,13 @@ shinyUI(
                                      "))
                    ),
                    tags$head(
-                     tags$style(type = "text/css", 
+                     tags$style(type = "text/css",
                                 ".shiny-input-container {padding-top: 0px !important;}
                                  .title {margin: auto; width: 200px}")
                    ),
-                   
+
                    bsCollapse(id = "colps_side",
-                              
+
                               # bsCollapsePanel(title = HTML('<font style="color: white;">File</font>'),
                               #            value="fileCollapse",
                               #            style="primary",
@@ -55,18 +56,18 @@ shinyUI(
                               #                     fileInput("file", label = h3("File input"),
                               #                               multiple = FALSE,
                               #                               accept = c(".csv", "text/csv")))),
-                              
-                              bsCollapsePanel(title = HTML('<font style="color: white;">Locations</font>'), 
-                                              value="locCollapse", 
+
+                              bsCollapsePanel(title = HTML('<font style="color: white;">Locations</font>'),
+                                              value="locCollapse",
                                               style = "primary",
                                               fluidRow(
-                                                
+
                                                 column(6, span(style = "color:black;",
                                                                h4("Choose Region"),
                                                                checkboxGroupInput(inputId = "region", label = NULL,
                                                                                   choices = list("Northern" = "Northern", "Central" = "Central"),
                                                                                   selected = c("Northern", "Central")))),
-                                                
+
                                                 column(6, span(style = "color: black;",
                                                                materialSwitch(inputId = "distSwitch",
                                                                               label = "Select by District",
@@ -83,13 +84,13 @@ shinyUI(
                                               br(),
                                               hidden(uiOutput("epaHeading")),
                                               hidden(uiOutput("epaPanel"))
-                                              
+
                               ),
-                              
+
                               bsCollapsePanel(title = HTML('<font style="color: white;">Sustainable Agriculture</font>'),
                                               value="sustCollapse",
                                               style = "primary",
-                                              
+
                                               tags$div(align = 'left',
                                                        style = "color:black;",
                                                        fluidRow(
@@ -106,14 +107,14 @@ shinyUI(
                                                                              choices = list("AND" = " & ",
                                                                                             "OR" = " | "),
                                                                              selected = " | ")),
-                                                       
+
                                                          column(2,
                                                                 dropdownButton(
                                                                   tags$h3("Chart of Sustainable Agriculture Types"),
                                                                   plotlyOutput("sustbar"),
-                                                                  circle = TRUE, 
-                                                                  status = "info", 
-                                                                  icon = icon("bar-chart-o"), 
+                                                                  circle = TRUE,
+                                                                  status = "info",
+                                                                  icon = icon("bar-chart-o"),
                                                                   width = "700px",
                                                                   tooltip = tooltipOptions(title = "Click for graph of sustainable agriculture types.")))
                                                        ),
@@ -121,11 +122,11 @@ shinyUI(
                                                        uiOutput("sust_inputs")
                                               )
                               ),
-                              
+
                               bsCollapsePanel(title = HTML('<font style="color: white;">Crops</font>'),
                                               value="sustCollapse",
                                               style = "primary",
-                                              
+
                                               tags$div(
                                                 align = 'left',
                                                 style = "color:black;",
@@ -142,9 +143,9 @@ shinyUI(
                                                          dropdownButton(
                                                            tags$h3("Chart of Crops"),
                                                            plotlyOutput("cropsbar"),
-                                                           circle = TRUE, 
-                                                           status = "info", 
-                                                           icon = icon("bar-chart-o"), 
+                                                           circle = TRUE,
+                                                           status = "info",
+                                                           icon = icon("bar-chart-o"),
                                                            width = "700px",
                                                            tooltip = tooltipOptions(title = "Click for graph of crops.")))
                                                 ),
@@ -154,24 +155,24 @@ shinyUI(
                                                 fluidRow(
                                                   column(3,
                                                          prettySwitch(inputId = "Vegetables.On",
-                                                                      label = "Vegetables", 
+                                                                      label = "Vegetables",
                                                                       status = "primary",
                                                                       slim = TRUE)),
                                                   column(3, uiOutput("crop_ext_Veg_chk")),
                                                   column(3,
                                                          prettySwitch(inputId = "Fruit_trees.On",
-                                                                      label = "Fruit Trees", 
+                                                                      label = "Fruit Trees",
                                                                       status = "primary",
                                                                       slim = TRUE)),
                                                   column(3, uiOutput("crop_ext_Fruit_chk"))
                                                 )
                                               )
                               ),
-                              
+
                               bsCollapsePanel(title = HTML('<font style="color: white;">Livestock</font>'),
                                               value="sustCollapse",
                                               style = "primary",
-                                              
+
                                               tags$div(align = 'left',
                                                        style = "color:black;",
                                                        fluidRow(
@@ -188,14 +189,14 @@ shinyUI(
                                                                              choices = list("AND" = " & ",
                                                                                             "OR" = " | "),
                                                                              selected = " | ")),
-                                                         
+
                                                          column(2,
                                                                 dropdownButton(
                                                                   tags$h3("Chart of Livestock Types"),
                                                                   plotlyOutput("livstkbar"),
-                                                                  circle = TRUE, 
-                                                                  status = "info", 
-                                                                  icon = icon("bar-chart-o"), 
+                                                                  circle = TRUE,
+                                                                  status = "info",
+                                                                  icon = icon("bar-chart-o"),
                                                                   width = "700px",
                                                                   tooltip = tooltipOptions(title = "Click for graph of livestock types.")))
                                                        ),
@@ -203,11 +204,11 @@ shinyUI(
                                                        uiOutput("livstk_inputs")
                                               )
                               ),
-                              
+
                               bsCollapsePanel(title = HTML('<font style="color: white;">Respondant</font>'),
                                               value="trnCollapse",
                                               style = "primary",
-                                              
+
                                               tags$div(align = 'left',
                                                        style = "color:black;",
                                                        fluidRow(
@@ -226,29 +227,29 @@ shinyUI(
                                                                    min = 1,
                                                                    max = 50,
                                                                    value = 30))
-                              ) 
-                   ),           
+                              )
+                   ),
                    # Cemac credit tag
                    div(style = "padding: 10px;",
-                       helpText("Dashboard by", a("CEMAC, University of Leeds", 
-                                                  href = "https://www.cemac.leeds.ac.uk", 
+                       helpText("Dashboard by", a("CEMAC, University of Leeds",
+                                                  href = "https://www.cemac.leeds.ac.uk",
                                                   target = "_blank")))
-                   
+
                      ),
-  
+
   # Main panel for displaying outputs ----
   dashboardBody(
-    
+
     bsCollapse(id = "colps_main", open = "mapCollapse",
                bsCollapsePanel(title = HTML('<font style="color : white">Map View</font>'), value="mapCollapse", style = "primary",
-                               
+
                                tags$head(tags$style("#myMap{height:75vh !important;}")),
-                               
+
                                leafletOutput("myMap")
-                               
+
                ),
                bsCollapsePanel(title = HTML('<font style="color : white">Plot View</font>'), value="plotCollapse", style = "primary",
-                               
+
                                tags$head(tags$style("#trnHist{height:35vh !important;}")),
                                fluidRow(
                                         tags$div(class="title", h3("Training Date")),
@@ -270,6 +271,6 @@ shinyUI(
                                  div(style = 'overflow-x: scroll', dataTableOutput('myDataTable')))
                )
     )
-    
+
   ))
 )
