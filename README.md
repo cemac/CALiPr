@@ -16,6 +16,8 @@ This repository contains an app for the exploration of Farm Survey data for the 
 
 The app is written using Shiny, a GUI creator for R, and is run through RStudio. It uses as inputs the csv and shape files included in this repository, which should be kept in the same folder as the R script files.
 
+Version 1.1 of the app is now accessible on the internet at the [CEMAC shiny apps space](https://cemac.shinyapps.io/CALiPr), however the source code for the app is available here should you need to run locally.
+
 Further documentation will be included in the [wiki](https://github.com/cemac/CALiPr/wiki) for this repository.
 
 # Requirements #
