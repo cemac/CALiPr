@@ -17,6 +17,12 @@ sust_ag <- list("Full_CA" = "Conservation Agriculture (a combination of Maximum 
                 "Manure_making" = "Manure Making",
                 "Pit_planting" = "Pit Planting",
                 "Sust_Other" = "Other")
+sust_ag2 <- list("Full Conserv Ag" = "Conservation Agriculture (a combination of Maximum Cover, Minimum Tillage, Rotations/Mixtures)",
+                 "Partial Conserv Ag" = "Any of: Maximum Cover; Minimum Tillage; Rotations/Mixtures",
+                 "Agroforestry" = "Agroforestry",
+                 "Manure Making" = "Manure Making",
+                 "Pit Planting" = "Pit Planting",
+                 "Other" = "Other")
 livstk <- list("Livestock_Cattle" = "Cattle",
                   "Livestock_Goats_Sheep" = "Goats/Sheep",
                   "Livestock_Pigs" = "Pigs",
@@ -209,10 +215,12 @@ shinyServer(function(input, output,session) {
 
     data <- data.frame(sust_ag, northvals, centvals)
 
-    plot_ly(data, x = ~northvals, y = ~names(sust_ag), type = 'bar', orientation = 'h', name = 'Northern',
+    plot_ly(data, x = ~northvals, y = ~names(sust_ag2), type = 'bar', orientation = 'h', name = 'Northern',
             marker = list(color = 'rgba(246, 78, 139, 0.6)',
                           line = list(color = 'rgba(246, 78, 139, 1.0)',
-                                      width = 3))) %>%
+                                      width = 3)),
+            width = 600,
+            height = 400) %>%
       add_trace(x = ~centvals, name = 'Central',
                 marker = list(color = 'rgba(58, 71, 80, 0.6)',
                               line = list(color = 'rgba(58, 71, 80, 1.0)',
@@ -221,12 +229,10 @@ shinyServer(function(input, output,session) {
              xaxis = list(title = "Number of Farms"),
              yaxis = list(title ="",
                           categoryorder = "array",
-                          categoryarray = ~rev(names(sust_ag))),
+                          categoryarray = ~rev(names(sust_ag2))),
              showlegend=FALSE,
              hovermode = 'compare',
              autosize = F,
-             width = 600,
-             height = 400,
              margin = list(l = 5,
                            r = 20,
                            b = 10,
@@ -361,12 +367,17 @@ shinyServer(function(input, output,session) {
       centvals[[n]] <- sum(central[names(cropnames)[[n]]], na.rm=T)
     }
 
+    cropnames2 = cropnames
+    names(cropnames2)=unlist(unname(cropnames))
+    
     data <- data.frame(cropnames, northvals, centvals)
 
-    plot_ly(data, x = ~northvals, y = ~names(cropnames), type = 'bar', orientation = 'h', name = 'Northern',
+    plot_ly(data, x = ~northvals, y = ~names(cropnames2), type = 'bar', orientation = 'h', name = 'Northern',
             marker = list(color = 'rgba(246, 78, 139, 0.6)',
                           line = list(color = 'rgba(246, 78, 139, 1.0)',
-                                      width = 3))) %>%
+                                      width = 3)),
+            width = 600,
+            height = 400) %>%
       add_trace(x = ~centvals, name = 'Central',
                 marker = list(color = 'rgba(58, 71, 80, 0.6)',
                               line = list(color = 'rgba(58, 71, 80, 1.0)',
@@ -375,12 +386,10 @@ shinyServer(function(input, output,session) {
              xaxis = list(title = "Number of Farms"),
              yaxis = list(title ="",
                           categoryorder = "array",
-                          categoryarray = ~rev(names(cropnames))),
+                          categoryarray = ~rev(names(cropnames2))),
              showlegend=FALSE,
              hovermode = 'compare',
              autosize = F,
-             width = 600,
-             height = 400,
              margin = list(l = 5,
                            r = 20,
                            b = 10,
@@ -473,12 +482,17 @@ shinyServer(function(input, output,session) {
       centvals[[n]] <- sum(central[paste0(names(livstk)[[n]])], na.rm=T)
     }
 
-    data <- data.frame(livstk, northvals, centvals)
+    livstk2 = livstk
+    names(livstk2)=unlist(unname(livstk))
+    
+    data <- data.frame(livstk2, northvals, centvals)
 
-    plot_ly(data, x = ~northvals, y = ~names(livstk), type = 'bar', orientation = 'h', name = 'Northern',
+    plot_ly(data, x = ~northvals, y = ~names(livstk2), type = 'bar', orientation = 'h', name = 'Northern',
             marker = list(color = 'rgba(246, 78, 139, 0.6)',
                           line = list(color = 'rgba(246, 78, 139, 1.0)',
-                                      width = 3))) %>%
+                                      width = 3)),
+            width = 600,
+            height = 400) %>%
       add_trace(x = ~centvals, name = 'Central',
                 marker = list(color = 'rgba(58, 71, 80, 0.6)',
                               line = list(color = 'rgba(58, 71, 80, 1.0)',
@@ -487,12 +501,10 @@ shinyServer(function(input, output,session) {
              xaxis = list(title = "Number of Farms"),
              yaxis = list(title ="",
                           categoryorder = "array",
-                          categoryarray = ~rev(names(livstk))),
+                          categoryarray = ~rev(names(livstk2))),
              showlegend=FALSE,
              hovermode = 'compare',
              autosize = F,
-             width = 600,
-             height = 400,
              margin = list(l = 5,
                            r = 20,
                            b = 10,
@@ -542,7 +554,7 @@ shinyServer(function(input, output,session) {
   output$FarmSize <- renderUI({
     sliderInput(inputId = "resp_fsize",
                 "Farm Size",
-                min=min(foldat()$Farm_size, na.rm=T),
+                min=0,
                 max=max(foldat()$Farm_size, na.rm=T),
                 value=c(min(foldat()$Farm_size, na.rm=T),max(foldat()$Farm_size, na.rm=T)))
   })
@@ -557,9 +569,10 @@ shinyServer(function(input, output,session) {
   output$Training <- renderUI ({
     sliderInput("trnrng",
                "Length of Trained Period (Days):",
-                min=min(fsizedat()$Length, na.rm=T),
+                min=max(min(fsizedat()$Length, na.rm=T),0),
                 max=max(fsizedat()$Length, na.rm=T),
-                value=c(min(fsizedat()$Length, na.rm=T), max(fsizedat()$Length, na.rm=T)))
+                #value=c(min(fsizedat()$Length, na.rm=T), max(fsizedat()$Length, na.rm=T)))
+               value=c(0, 2500))
 
   })
 
@@ -580,7 +593,7 @@ shinyServer(function(input, output,session) {
     leaflet() %>%
       addProviderTiles(providers$CartoDB.Positron, group = "Default Maptile") %>%
       addProviderTiles(providers$Esri.WorldImagery, group = "Satellite Maptile") %>%
-      setView(34.3015,-13.2512,zoom=12) %>%
+      setView(34.3015,-13.2512,zoom=7) %>%
       addLayersControl(
         baseGroups = c("Default Maptile", "Satellite Maptile"),
         options = layersControlOptions(collapsed = FALSE)) %>%
@@ -609,62 +622,151 @@ shinyServer(function(input, output,session) {
   #         Plotting Panel                                                                                 #
   #--------------------------------------------------------------------------------------------------------#
 
-  output$trnHist <- renderPlot({
+  output$trnHist <- renderPlotly ({
+    
     validate(
       need((nrow(myData()) >= 1), "No data in dataset. Subsetting too restrictive")
     )
+    
     x <- myData()$Length
+    
+    north <- subset(myData(), Lat !=0 & Region == "Northern")
+    central <- subset(myData(), Lat !=0 & Region == "Central")
+    
+    northlen=north$Length
+    centlen=central$Length
+    
     # generate bins based on input$bins and range in input$trnrng from ui.R
     if (! is.null(input$trnrng) ) {
-
+      
       min_bin = input$trnrng[[1]]
       max_bin = input$trnrng[[2]]
-      binnum = input$bins + 1
+      binnum = max(input$trnBins, 1)
     } else {
       min_bin = min(myData()$Length, na.rm=T)
       max_bin = max(myData()$Length, na.rm=T)
-      binnum = 31
+      binnum = 30
     }
     bins <- seq(min_bin, max_bin, length.out = binnum)
-
+    
+    binsize= max((max_bin-min_bin)/binnum,1.0)
+    
+    xbins=list(
+      start = min_bin,
+      end = max_bin,
+      size = binsize
+    )
+    
+    mn <- list(color = 'rgba(0, 104, 42, 0.6)',
+               line = list(color = 'rgba(0, 104, 42, 1.0)',
+                           width = 3))
+    mc <- list(color = 'rgba(58, 71, 80, 0.6)',
+               line = list(color = 'rgba(58, 71, 80, 1.0)',
+                           width = 3))
+    
     # draw the histogram with the specified number of bins and within specified range
-    hist(x[x >= min_bin & x <= max_bin],
-         breaks = unique(bins),
-         col = 'darkgray',
-         main = NULL,
-         xlab = "Date")
+    
+    plot_ly(x = centlen,
+            name = 'Central',
+            type = "histogram",
+            autobinx = F,
+            xbins = xbins,
+            marker = mc,
+            width = 600,
+            height = 305) %>%
+      
+      add_trace(x = northlen,
+              name = 'Northern',
+              type = "histogram",
+              autobinx = F,
+              xbins = xbins,
+              marker = mn) %>%
+      
+      config(displayModeBar = F, showLink = F) %>%
+      
+      layout(barmode='stack', 
+             showlegend = F,
+             hovermode = 'compare',
+             yaxis = list(title = "Frequency"),
+             xaxis = list(title = "Time Trained (Days)"))
+    
   })
-
+  
   output$trnSum <- renderTable({
     x <- as.array(summary(date(myData()$Date_trained)))
     format(x, '%Y-%m-%d')
   }, colnames = FALSE, rownames = TRUE)
 
-  output$farmHist <- renderPlot({
+  
+  output$farmHist <- renderPlotly ({
+    
     validate(
       need((nrow(myData()) >= 1), "No data in dataset. Subsetting too restrictive")
     )
+
     x <- myData()$Farm_size
-    # generate bins based on input$bins and range in input$trnrng from ui.R
+
     if (! is.null(input$resp_fsize) ) {
+      
       min_bin = input$resp_fsize[[1]]
       max_bin = input$resp_fsize[[2]]
-      binnum = input$bins + 1
+      binnum = max(input$frmBins, 1)
     } else {
       min_bin = min(myData()$Farm_size, na.rm=T)
       max_bin = max(myData()$Farm_size, na.rm=T)
-      binnum = 31
+      binnum = 30
     }
-    bins <- seq(min_bin, max_bin, length.out = binnum)
+    
+    north <- subset(myData(), Lat !=0 & Region == "Northern")
+    central <- subset(myData(), Lat !=0 & Region == "Central")
+    
+    northfrm=north$Farm_size
+    centfrm=central$Farm_size
 
+    binsize=(max_bin-min_bin)/binnum
+    
+    xbins=list(
+      start = min_bin,
+      end = max_bin,
+      size = binsize
+    )
+
+    mn <- list(color = 'rgba(0, 104, 42, 0.6)',
+               line = list(color = 'rgba(0, 104, 42, 1.0)',
+                           width = 3))
+    mc <- list(color = 'rgba(58, 71, 80, 0.6)',
+               line = list(color = 'rgba(58, 71, 80, 1.0)',
+                           width = 3))
+    
     # draw the histogram with the specified number of bins and within specified range
-    hist(x[x >= min_bin & x <= max_bin],
-         breaks = unique(bins),
-         col = 'darkgray',
-         main = NULL,
-         xlab = "Farm size")
+    
+    plot_ly(x = centfrm,
+            name = 'Central',
+            type = "histogram",
+            autobinx = F,
+            xbins = xbins,
+            marker = mc,
+            width = 600,
+            height = 325) %>%
+      
+      add_trace(x = northfrm,
+                name = 'Northern',
+                type = "histogram",
+                autobinx = F,
+                xbins = xbins,
+                marker = mn) %>%
+      
+      config(displayModeBar = F, showLink = F) %>%
+      
+      layout(barmode='stack', 
+             showlegend = F,
+             hovermode = 'compare',
+             yaxis = list(title = "Frequency"),
+             xaxis = list(title = "Farm Size")
+      )
+    
   })
-
+  
   output$farmSum <- renderTable({
     x <- as.array(summary(myData()$Farm_size))
   }, colnames = FALSE, rownames = TRUE)
@@ -674,10 +776,16 @@ shinyServer(function(input, output,session) {
   #         Table Panel                                                                                 #
   #-----------------------------------------------------------------------------------------------------#
 
-  output$myDataTable <- renderDataTable({myData()},
-                                        options = list(pageLength = 5,
-                                                       lengthMenu = c(5, 10, 15, 20)
+  output$myDataTable <- DT::renderDataTable({myData()},
+                                        options = list(pageLength = 10,
+                                                       lengthMenu = c(10, 20, 50),
+                                                       columnDefs = list(
+                                                         list(
+                                                           visible=F,
+                                                           targets=c(1,15,22,39)
+                                                         )
                                                        )
+                                                      )
                                         )
 
   output$downloadData <- downloadHandler(filename = function() {"FarmSurvey_Subset.csv"},
@@ -693,13 +801,13 @@ shinyServer(function(input, output,session) {
 
   observeEvent(input$colps_side, ({
     if (input$colps_side == "trnCollapse") {
-      updateCollapse(session, "colps_main", open="plotCollapse")
+      updateTabsetPanel(session, "tab_main", selected="plotTab")
     }
   }))
 
   observeEvent(input$colps_side, ({
     if (input$colps_side != "trnCollapse") {
-      updateCollapse(session, "colps_main", open="mapCollapse")
+      updateTabsetPanel(session, "tab_main", selected="mapTab")
     }
   }))
 

@@ -1,3 +1,8 @@
 .RData
 .Rhistory
 FarmSurveyClean.csv
+rsconnect/
+FarmSurvey.csv.gpg
+*.eps
+*.pptx
+.directory

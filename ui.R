@@ -10,6 +10,7 @@ library(shinyBS)
 library(shinyjs)
 library(shinyWidgets)
 library(plotly)
+library(DT)
 
 # Define UI for application that explores farm survey data
 shinyUI(
@@ -124,7 +125,7 @@ shinyUI(
                               ),
 
                               bsCollapsePanel(title = HTML('<font style="color: white;">Crops</font>'),
-                                              value="sustCollapse",
+                                              value="cropCollapse",
                                               style = "primary",
 
                                               tags$div(
@@ -170,7 +171,7 @@ shinyUI(
                               ),
 
                               bsCollapsePanel(title = HTML('<font style="color: white;">Livestock</font>'),
-                                              value="sustCollapse",
+                                              value="livstkCollapse",
                                               style = "primary",
 
                                               tags$div(align = 'left',
@@ -221,12 +222,7 @@ shinyUI(
                                                                 uiOutput ("LiteracyPanel"))),
                                                        uiOutput ("Followers"),
                                                        uiOutput ("FarmSize"),
-                                                       uiOutput("Training"),
-                                                       sliderInput("bins",
-                                                                   "Number of bins:",
-                                                                   min = 1,
-                                                                   max = 50,
-                                                                   value = 30))
+                                                       uiOutput("Training"))
                               )
                    ),
                    # Cemac credit tag
@@ -239,36 +235,67 @@ shinyUI(
 
   # Main panel for displaying outputs ----
   dashboardBody(
+    
+    tags$style(HTML("
+    .tabbable > .nav > li > a                  {background-color: #428bca;  color:white}
+    .tabbable > .nav > li[class=active]    > a {background-color: #244e73; color:white}
+    ")),
 
-    bsCollapse(id = "colps_main", open = "mapCollapse",
-               bsCollapsePanel(title = HTML('<font style="color : white">Map View</font>'), value="mapCollapse", style = "primary",
+    tabsetPanel(id = "tab_main",
+               tabPanel(title = HTML('Map View'), value="mapTab", style = "primary",
 
-                               tags$head(tags$style("#myMap{height:75vh !important;}")),
-
-                               leafletOutput("myMap")
+                        tags$head(tags$style("#myMap{height:80vh !important;}")),
+                        br(),
+                        box(status = "primary",
+                            width = 12,
+                            leafletOutput("myMap")
+                        )
 
                ),
-               bsCollapsePanel(title = HTML('<font style="color : white">Plot View</font>'), value="plotCollapse", style = "primary",
+               tabPanel(title = HTML('Plot View'), value="plotTab", style = "primary",
 
-                               tags$head(tags$style("#trnHist{height:35vh !important;}")),
+                               tags$head(tags$style("#trnHist{height:32vh !important;}")),
+                               tags$head(tags$style("#farmHist{height:32vh !important;}")),
+                               br(),
+                              
                                fluidRow(
-                                        tags$div(class="title", h3("Training Date")),
-                                 column(6,
-                                        plotOutput("trnHist")),
-                                 column(4, offset = 1,
-                                        tableOutput("trnSum"))),
+                                 box(title="Training Date", 
+                                     status = "primary",
+                                     width=12,
+                                     solidHeader = T,
+                                     column(6,
+                                            plotlyOutput("trnHist")),
+                                     column(4, offset = 1,
+                                            fluidRow(
+                                              tableOutput("trnSum"),
+                                              sliderInput("trnBins",
+                                                          "Number of bins:",
+                                                          min = 1,
+                                                          max = 100,
+                                                          value = 50))))),
                                fluidRow(
-                                 tags$div(class="title", h3("Farm Size")),
-                                 column(6,
-                                        plotOutput("farmHist", height="300px")),
-                                 column(4, offset = 1,
-                                        tableOutput("farmSum")))
+                                 box(title="Farm Size",
+                                     status = "primary",
+                                     width=12,
+                                     height=400,
+                                     solidHeader = T,    
+                                     column(6,
+                                            plotlyOutput("farmHist")),
+                                     column(4, offset = 1,
+                                            fluidRow(
+                                              tableOutput("farmSum"),
+                                              sliderInput("frmBins",
+                                                          "Number of bins:",
+                                                          min = 1,
+                                                          max = 50,
+                                                          value = 25)))))
                ),
-               bsCollapsePanel(title = HTML('<font style="color : white">Table View</font>'), value="tableCollapse", style = "primary",
+               tabPanel(title = HTML('Table View'), value="tableTab", style = "primary",
+                               br(),
                                downloadButton("downloadData", "Export CSV"),
                                box(
                                  title = "Selected subset of data", width = NULL, status = "primary",
-                                 div(style = 'overflow-x: scroll', dataTableOutput('myDataTable')))
+                                 div(style = 'overflow-x: scroll', DT::dataTableOutput('myDataTable')))
                )
     )
 
