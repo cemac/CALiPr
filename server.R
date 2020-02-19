@@ -39,14 +39,27 @@ shinyServer(function(input, output,session) {
 
   #landuse <- raster("LandCover_2010_SchemeII1.tif")
   #soil <- readOGR(dsn = "./Malawi_Soils",layer = "Malawi_Soils")
-  FarmSurvey <- read.csv("FarmSurveyClean.csv", header = TRUE, sep = ",")
-
+  #FarmSurvey <- read.csv("FarmSurveyClean.csv", header = TRUE, sep = ",")
+  
+  #-----------------------------------------------------------------------------------------------------#
+  #              File Upload Panel                                                                      #
+  #-----------------------------------------------------------------------------------------------------#  
+  
+  FarmSurvey <- reactive({
+    req(input$file1)
+    read.csv(input$file1$datapath,
+             header = input$header,
+             sep = input$sep,
+             quote = input$quote)
+  })
+  
   #-----------------------------------------------------------------------------------------------------#
   #              Location Panel                                                                         #
   #-----------------------------------------------------------------------------------------------------#
 
   regdat <- reactive({
-      subset(FarmSurvey, Lat != 0 & Region %in% input$region)
+      req(FarmSurvey())
+      subset(FarmSurvey(), Lat != 0 & Region %in% input$region)
   })
 
   observeEvent(input$distSwitch, {
@@ -59,6 +72,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$altitude <- renderUI({
+    req(regdat())
     tags$div(align = 'left',
              style = "color:black;",
              h4("Select Altitude Range", style = "color:black;"),
@@ -72,6 +86,7 @@ shinyServer(function(input, output,session) {
   })
 
   altdat <- reactive({
+    req(regdat())
     if (! is.null(input$alt_slide)){
       subset(regdat(), Altitude >= input$alt_slide[[1]] &  Altitude <= input$alt_slide[[2]])
     } else {
@@ -79,6 +94,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$districtPanel <- renderUI({
+    req(altdat())
     tags$div(align = 'left',
              style = "color:black;",
              h4("Choose District(s)", style = "color:black;"),
@@ -94,6 +110,7 @@ shinyServer(function(input, output,session) {
   })
 
   distdat<-reactive({
+    req(altdat())
     if ( is.null(input$district) | input$distSwitch == F ){
       altdat()
     } else {
@@ -106,6 +123,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$epaPanel <- renderUI({
+    req(distdat())
     h4("Choose EPA(s)", style = "color: black;")
     tags$div(
       align='left',
@@ -124,6 +142,7 @@ shinyServer(function(input, output,session) {
   })
 
   epadat<-reactive({
+    req(distdat())
     if (is.null(input$epa) | input$epaSwitch == F){
       distdat()
     } else {
@@ -187,6 +206,7 @@ shinyServer(function(input, output,session) {
     tagList(sustVector())})
 
   sustdat <- reactive({
+    req(epadat())
     sustlist1 <- reactiveValuesToList(rvsust)
     if (TRUE %in% sapply(sustlist1, is.null)) {
       sustlist2 = sustlist1[-which(sapply(sustlist1, is.null))]
@@ -204,8 +224,9 @@ shinyServer(function(input, output,session) {
   })
 
   output$sustbar <- renderPlotly ({
-    north <- subset(FarmSurvey, Lat != 0 & Region == "Northern")
-    central <- subset(FarmSurvey, Lat != 0 & Region == "Central")
+    req(FarmSurvey())
+    north <- subset(FarmSurvey(), Lat != 0 & Region == "Northern")
+    central <- subset(FarmSurvey(), Lat != 0 & Region == "Central")
     northvals = numeric(0)
     centvals = numeric(0)
     for (n in 1:length(sust_ag)) {
@@ -346,6 +367,7 @@ shinyServer(function(input, output,session) {
   })
 
   cropdat <- reactive({
+    req(sustdat())
     croplist1 <-reactiveValuesToList(rvcrop)
     if (TRUE %in% sapply(croplist1, is.null)) {
       croplist2 = croplist1[-which(sapply(croplist1, is.null))]
@@ -358,8 +380,9 @@ shinyServer(function(input, output,session) {
   })
 
   output$cropsbar <- renderPlotly ({
-    north <- subset(FarmSurvey, Lat != 0 & Region == "Northern")
-    central <- subset(FarmSurvey, Lat != 0 & Region == "Central")
+    req(FarmSurvey())
+    north <- subset(FarmSurvey(), Lat != 0 & Region == "Northern")
+    central <- subset(FarmSurvey(), Lat != 0 & Region == "Central")
     northvals = numeric(0)
     centvals = numeric(0)
     for (n in 1:length(cropnames)) {
@@ -456,6 +479,7 @@ shinyServer(function(input, output,session) {
     tagList(livstkVector())})
 
   livstkdat <- reactive({
+    req(cropdat())
     livstklist1 <- reactiveValuesToList(rvlivstk)
     if (TRUE %in% sapply(livstklist1, is.null)) {
       livstklist2 = livstklist1[-which(sapply(livstklist1, is.null))]
@@ -473,6 +497,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$livstkbar <- renderPlotly ({
+    req(FarmSurvey())
     north <- subset(FarmSurvey, Lat != 0 & Region == "Northern")
     central <- subset(FarmSurvey, Lat != 0 & Region == "Central")
     northvals = numeric(0)
@@ -530,6 +555,7 @@ shinyServer(function(input, output,session) {
   })
 
   litdat<-reactive({
+    req(livstkdat())
     if (! is.null(input$resp_lit)){
       subset(livstkdat(), Literacy %in% input$resp_lit )
     } else {
@@ -537,6 +563,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$Followers <- renderUI({
+    req(litdat())
     sliderInput(inputId = "resp_foll",
                 "Number of Followers",
                 min=min(litdat()$Number_followers, na.rm=T),
@@ -545,6 +572,7 @@ shinyServer(function(input, output,session) {
   })
 
   foldat <- reactive({
+    req(litdat())
     if (! is.null(input$resp_foll)){
       subset(litdat(), Number_followers >= input$resp_foll[[1]] &  Number_followers <= input$resp_foll[[2]])
     } else {
@@ -552,6 +580,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$FarmSize <- renderUI({
+    req(foldat())
     sliderInput(inputId = "resp_fsize",
                 "Farm Size",
                 min=0,
@@ -560,6 +589,7 @@ shinyServer(function(input, output,session) {
   })
 
   fsizedat <- reactive({
+    req(foldat())
     if (! is.null(input$resp_foll)){
       subset(foldat(), Farm_size >= input$resp_fsize[[1]] &  Farm_size <= input$resp_fsize[[2]])
     } else {
@@ -567,6 +597,7 @@ shinyServer(function(input, output,session) {
   })
 
   output$Training <- renderUI ({
+    req(fsizedat())
     sliderInput("trnrng",
                "Length of Trained Period (Days):",
                 min=max(min(fsizedat()$Length, na.rm=T),0),
@@ -577,6 +608,7 @@ shinyServer(function(input, output,session) {
   })
 
   trndat <- reactive({
+    req(fsizedat())
     if ( ! is.null(input$trnrng)){
       subset(fsizedat(), Length >= input$trnrng[[1]] & Length <= input$trnrng[[2]])
     } else {fsizedat()}
@@ -586,7 +618,10 @@ shinyServer(function(input, output,session) {
   #          Mapping Panel                                                                                  #
   #---------------------------------------------------------------------------------------------------------#
 
-  myData<-reactive({trndat()})
+  myData<-reactive({
+    req(trndat())
+    trndat()
+  })
 
   output$myMap <- renderLeaflet({
 
@@ -605,6 +640,8 @@ shinyServer(function(input, output,session) {
   })
 
   observe({
+    
+    req(myData())
 
     leafletProxy("myMap", data = myData()) %>%
       clearMarkerClusters() %>%
@@ -623,6 +660,8 @@ shinyServer(function(input, output,session) {
   #--------------------------------------------------------------------------------------------------------#
 
   output$trnHist <- renderPlotly ({
+    
+    req(myData())
     
     validate(
       need((nrow(myData()) >= 1), "No data in dataset. Subsetting too restrictive")
@@ -693,12 +732,15 @@ shinyServer(function(input, output,session) {
   })
   
   output$trnSum <- renderTable({
+    req(myData())
     x <- as.array(summary(date(myData()$Date_trained)))
     format(x, '%Y-%m-%d')
   }, colnames = FALSE, rownames = TRUE)
 
   
   output$farmHist <- renderPlotly ({
+    
+    req(myData())
     
     validate(
       need((nrow(myData()) >= 1), "No data in dataset. Subsetting too restrictive")
@@ -768,6 +810,7 @@ shinyServer(function(input, output,session) {
   })
   
   output$farmSum <- renderTable({
+    req(myData())
     x <- as.array(summary(myData()$Farm_size))
   }, colnames = FALSE, rownames = TRUE)
 
@@ -776,25 +819,27 @@ shinyServer(function(input, output,session) {
   #         Table Panel                                                                                 #
   #-----------------------------------------------------------------------------------------------------#
 
-  output$myDataTable <- DT::renderDataTable({myData()},
-                                        options = list(pageLength = 10,
-                                                       lengthMenu = c(10, 20, 50),
-                                                       columnDefs = list(
-                                                         list(
-                                                           visible=F,
-                                                           targets=c(1,15,22,39)
-                                                         )
-                                                       )
-                                                      )
-                                        )
+  output$myDataTable <- DT::renderDataTable({
+    req(myData())
+    myData()
+    },options = list(pageLength = 10,
+                     lengthMenu = c(10, 20, 50),
+                     columnDefs = list(list(visible=F,
+                                            targets=c(1,15,22,39)
+                                            )
+                                       )
+                     )
+    )
+  
+  observe({
+    req(myData())
+    enable("downloadData")
+  })
 
   output$downloadData <- downloadHandler(filename = function() {"FarmSurvey_Subset.csv"},
-                                         content = function(file) {write.csv(myData(),
-                                                                             file,
-                                                                             row.names = FALSE)
-                                                                  }
-                                         )
-
+                                         content = function(file) {
+                                         write.csv(myData(),file,row.names = FALSE)})
+  
   #-------------------------------------------------------------------------------------------------------#
   #         Inter-Panel Control                                                                           #
   #-------------------------------------------------------------------------------------------------------#
@@ -802,11 +847,9 @@ shinyServer(function(input, output,session) {
   observeEvent(input$colps_side, ({
     if (input$colps_side == "trnCollapse") {
       updateTabsetPanel(session, "tab_main", selected="plotTab")
-    }
-  }))
-
-  observeEvent(input$colps_side, ({
-    if (input$colps_side != "trnCollapse") {
+    } else if (input$colps_side == "fileCollapse") {
+      updateTabsetPanel(session, "tab_main", selected="tableTab")
+    } else {
       updateTabsetPanel(session, "tab_main", selected="mapTab")
     }
   }))

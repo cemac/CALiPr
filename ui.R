@@ -48,15 +48,37 @@ shinyUI(
                    ),
 
                    bsCollapse(id = "colps_side",
-
-                              # bsCollapsePanel(title = HTML('<font style="color: white;">File</font>'),
-                              #            value="fileCollapse",
-                              #            style="primary",
-                              #            tags$div(align = 'left',
-                              #                     style = "color:black;",
-                              #                     fileInput("file", label = h3("File input"),
-                              #                               multiple = FALSE,
-                              #                               accept = c(".csv", "text/csv")))),
+                              
+                              bsCollapsePanel(title = HTML('<font style="color: white;">File</font>'),
+                                              value="fileCollapse",
+                                              style="primary",
+                                              tags$div(align = 'left',
+                                                       style = "color:black;",
+                                                       fileInput("file1", "Choose CSV File",
+                                                                 multiple = TRUE,
+                                                                 accept = c("text/csv",
+                                                                            "text/comma-separated-values,text/plain",
+                                                                            ".csv")),
+                                                       
+                                                       # Horizontal line ----
+                                                       tags$hr(),
+                                                       
+                                                       # Input: Checkbox if file has header ----
+                                                       checkboxInput("header", "Header", TRUE),
+                                                       
+                                                       # Input: Select separator ----
+                                                       radioButtons("sep", "Separator",
+                                                                    choices = c(Comma = ",",
+                                                                                Semicolon = ";",
+                                                                                Tab = "\t"),
+                                                                    selected = ","),
+                                                       
+                                                       # Input: Select quotes ----
+                                                       radioButtons("quote", "Quote",
+                                                                    choices = c(None = "",
+                                                                                "Double Quote" = '"',
+                                                                                "Single Quote" = "'"),
+                                                                    selected = '"'))),
 
                               bsCollapsePanel(title = HTML('<font style="color: white;">Locations</font>'),
                                               value="locCollapse",
@@ -292,7 +314,7 @@ shinyUI(
                ),
                tabPanel(title = HTML('Table View'), value="tableTab", style = "primary",
                                br(),
-                               downloadButton("downloadData", "Export CSV"),
+                               disabled(downloadButton("downloadData", "Export CSV")),
                                box(
                                  title = "Selected subset of data", width = NULL, status = "primary",
                                  div(style = 'overflow-x: scroll', DT::dataTableOutput('myDataTable')))
