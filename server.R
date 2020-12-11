@@ -39,7 +39,6 @@ shinyServer(function(input, output,session) {
 
   #landuse <- raster("LandCover_2010_SchemeII1.tif")
   #soil <- readOGR(dsn = "./Malawi_Soils",layer = "Malawi_Soils")
-  #FarmSurvey <- read.csv("FarmSurveyClean.csv", header = TRUE, sep = ",")
   
   #-----------------------------------------------------------------------------------------------------#
   #              File Upload Panel                                                                      #
