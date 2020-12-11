@@ -5,7 +5,7 @@
   <br>
 </div>
 
-# Malawi-CALiPr Data Exploration Tool #
+# [Malawi-CALiPr Data Exploration Tool](https://cemac.shinyapps.io/CALiPr) #
 
 [![GitHub release](https://img.shields.io/github/release/cemac/CALiPr.svg)](https://github.com/cemac/CALiPr/releases) [![GitHub top language](https://img.shields.io/github/languages/top/cemac/CALiPr.svg)](https://github.com/cemac/CALiPr) [![GitHub issues](https://img.shields.io/github/issues/cemac/CALiPr.svg)](https://github.com/cemac/cemac_generic/CALiPr) [![GitHub last commit](https://img.shields.io/github/last-commit/cemac/CALiPr.svg)](https://github.com/cemac/CALiPr/commits/master) [![GitHub All Releases](https://img.shields.io/github/downloads/cemac/CALiPr/total.svg)](https://github.com/cemac/CALiPr/releases)![GitHub](https://img.shields.io/github/license/cemac/CALiPr.svg)[![DOI](https://zenodo.org/badge/192755973.svg)](https://zenodo.org/badge/latestdoi/192755973)
 
@@ -15,6 +15,8 @@
 This repository contains an app for the exploration of Farm Survey data for the project "Optimising Crop Residuals for Conservation Agriculture and Livestock Production in Malawi", or "Malawi-CALiPr". 
 
 The app is written using Shiny, a GUI creator for R, and is run through RStudio. It uses as inputs the csv and shape files included in this repository, which should be kept in the same folder as the R script files.
+
+Version 1.1 of the app is now accessible on the internet at the [CEMAC shiny apps space](https://cemac.shinyapps.io/CALiPr), however the source code for the app is available here should you need to run locally.
 
 Further documentation will be included in the [wiki](https://github.com/cemac/CALiPr/wiki) for this repository.
 
